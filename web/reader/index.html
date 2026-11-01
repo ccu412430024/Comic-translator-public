@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>本機漫畫翻譯 · 閱讀測試</title><link rel="stylesheet" href="/reader.css"><script src="/model-picker.js" defer></script><script src="/library-platforms.js" defer></script><script src="/work-picker.js" defer></script><script src="/gemini-connection.js" defer></script><script src="/gemini-status.js" defer></script><script src="/reader.js" defer></script></head>
+<body>
+<header><div><span class="eyebrow">COMIC TRANSLATOR</span><h1>翻譯，接著讀下去。</h1><a href="/library" target="_blank" rel="noopener">管理作品資料 ↗</a></div><span id="connection" class="connection">連接本機服務…</span></header>
+<main>
+<aside>
+  <section><h2>作品與閱讀記憶</h2><div id="work-memory"></div></section>
+  <section><h2>文字偵測</h2><div class="modes">
+    <label><input type="radio" name="mode" value="standard" checked><span><strong>RT-DETR</strong><small>原本的偵測方式</small></span></label>
+    <label><input type="radio" name="mode" value="tiled"><span><strong>RT-DETR 分塊版</strong><small>補找小字，處理時間較長</small></span></label>
+    <label><input type="radio" name="mode" value="paddle"><span><strong>PP-OCRv6</strong><small>較多框外字，也可能誤認背景</small></span></label>
+  </div><p class="hint">切換模式後，按「翻譯這一頁」比較效果。</p></section>
+  <section><h2>文字辨識</h2><label class="field">OCR 模型<select id="ocr-model"><option value="nar">NAR</option><option value="base" selected>Manga-OCR（預設）</option><option value="paddle">Paddle</option></select></label><p class="hint">NAR 速度快；Paddle 較慢，適合比較歪斜或彎曲文字。切換後重新翻譯本頁。</p></section>
+  <section><h2>消字與排版</h2>
+    <button id="comic-original" class="text-button" disabled>一鍵套用 Comic Translate 原方案</button>
+    <label class="field">消字方案<select id="cleaning"><option value="standard">改良版：LaMa＋氣泡清理</option><option value="comic-original">Comic Translate 原方案（AOT）</option><option value="ctd-lama">CTD 遮罩＋LaMa</option><option value="ctd-aot">CTD 遮罩＋AOT</option><option value="hybrid-lama">CTD 混合遮罩＋LaMa</option><option value="hybrid-aot">CTD 混合遮罩＋AOT</option></select></label>
+    <label class="field">排版方案<select id="layout"><option value="contour">輪廓排版＋繁體斷詞</option><option value="rectangle">基礎矩形排版</option><option value="comic-original">Comic Translate 原版 Qt 排版</option><option value="sam">SAM 2.1＋輪廓排版</option></select></label>
+    <p class="hint">Comic Translate 原方案採上游純色氣泡快填＋AOT 與 Qt 排版；其他方案保留改良氣泡清理。所有方案都有描邊，不加底板。</p>
+    <p class="hint">同頁切換消字或排版會重用譯文。重新按「翻譯這一頁」比較。</p>
+  </section>
+  <section><h2>翻譯</h2><label class="field">翻譯引擎<select id="translator"><option value="gemini">Gemini</option><option value="google-web">Google · 免金鑰測試</option></select></label>
+    <div id="gemini-model-controls">
+      <label class="field">Gemini 模型<select id="gemini-model"><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite（預設）</option></select></label>
+      <label class="field" id="custom-model-field" hidden>自訂模型 ID<input id="custom-model" type="text" maxlength="100" placeholder="gemini-…" autocomplete="off" spellcheck="false"></label>
+      <label class="field">作品上下文用量檔位<select id="memory-tokens"><option value="6000">精簡 · 6,000 估算 token</option><option value="12000" selected>標準 · 12,000（預設）</option><option value="24000">擴充 · 24,000</option><option value="48000">大量 · 48,000</option></select></label>
+      <p class="hint">顯式快取成功時，此檔位限制動態記憶，固定資料另有 48,000 估算 token 額度；其餘情況限制兩者合計。本頁原文、圖片與翻譯指令另計，保留本機完整資料。</p>
+      <p class="hint">選擇後，下次翻譯生效。切換模型會重新翻譯；可用性依 API 專案權限。</p>
+      <p class="hint">429 共用冷卻後重試最多 4 次；503 立即重試最多 3 次。畫面顯示冷卻與重試次數，停止翻譯會取消等待及後續重試。</p>
+      <button id="check-gemini" class="secondary" type="button">測試 Gemini 連線</button><p id="model-status" class="hint" role="status"></p>
+      <details><summary>Gemini 付費加速選項</summary>
+      <label class="field">固定上下文雲端快取<select id="gemini-cache"><option value="off">關閉顯式快取（預設）</option><option value="explicit">啟用顯式快取</option></select></label>
+      <p class="hint">固定提示詞與作品資料保存於 Google，每次重用自動續期至當下起 10 分鐘，儲存費隨保存時間計算。圖片與動態記憶不進顯式快取；建立失敗或失效回退時按合計上限裁切，續期失敗則保留原到期時間。</p>
+      <label class="field">服務等級<select id="gemini-tier"><option value="standard">Standard（預設）</option><option value="priority">Priority 優先推論</option></select></label>
+      <p id="priority-note" class="hint">AI Studio 的 Priority 需要 Tier 2／3；Vertex AI 使用 Priority PayGo。費率與可用性依模型及專案。</p>
+      <button id="clear-gemini-cache" class="secondary" type="button">清除目前雲端快取</button><p id="gemini-cloud-status" class="hint" role="status"></p>
+      </details>
+    </div>
+    <details id="settings"><summary>Gemini 設定 <span id="key-state"></span></summary><form id="settings-form" autocomplete="off">
+      <label class="field">Gemini 連線<select id="gemini-backend"><option value="developer">Google AI Studio · API 金鑰</option><option value="vertex">Vertex AI · GCP 專案</option></select></label>
+      <div id="developer-settings"><label class="field">API 金鑰<input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="只保存在本次服務記憶體"></label></div>
+      <div id="vertex-settings" hidden><label class="field">GCP 專案 ID<input id="vertex-project" type="text" maxlength="30" placeholder="your-project-id" spellcheck="false"></label><label class="field">區域<input id="vertex-location" type="text" maxlength="40" value="global" list="vertex-locations" spellcheck="false"></label><datalist id="vertex-locations"><option value="global"><option value="us-central1"><option value="asia-east1"><option value="asia-northeast1"></datalist><p id="vertex-auth-state" class="hint"></p><details><summary>首次登入與啟用方式</summary><ol><li>在 Google Cloud 專案啟用 Vertex AI API，連結持有試用額度的帳單帳戶；登入帳戶需具備 Vertex AI User 與 Service Usage Consumer 權限。</li><li>安裝 <a href="https://cloud.google.com/sdk/docs/install" target="_blank" rel="noopener">Google Cloud CLI</a>，開啟一般 PowerShell，執行 <code>gcloud auth application-default login</code> 並完成 Google 登入。</li><li>再執行 <code id="vertex-quota-command">gcloud auth application-default set-quota-project YOUR_PROJECT_ID</code>。</li><li>回到此頁套用設定，再按「測試 Gemini 連線」。</li></ol><p class="hint">登入憑證由 Google Cloud CLI 保管在本機；不需貼上服務帳戶私鑰。試用抵扣與剩餘額度以 GCP 帳單為準，升級付費後超額仍可能收費。</p></details></div>
+      <button type="submit" class="secondary">套用設定</button><p id="settings-status" class="hint" role="status"></p>
+    </form></details>
+    <p id="provider-note" class="hint">使用 Gemini 時，本頁圖片與辨識文字會送至 Google API。</p>
+  </section>
+  <section class="chrome"><h2>在 Chrome 閱讀網頁</h2><p>載入擴充套件後，在 BookWalker 閱讀頁按擴充套件，即可翻譯目前畫面或選取範圍。</p>
+    <ol><li>開啟 <button id="copy-extensions" class="text-button">複製 chrome://extensions</button></li><li>開啟「開發人員模式」→「載入未封裝項目」</li><li>選擇擴充套件資料夾 <button id="copy-path" class="text-button">複製資料夾路徑</button></li></ol>
+    <a href="/download/extension.zip">下載擴充套件 ZIP</a><p class="hint">載入後保留本機服務運作；每次只翻譯目前顯示的畫面。</p>
+  </section>
+</aside>
+<article>
+  <div class="reader-toolbar"><div><strong id="page-title">自製排版測試圖</strong><small id="page-count">1 / 2</small></div><label class="file-button">選擇本機圖片<input id="files" type="file" accept="image/png,image/jpeg,image/webp" multiple></label></div>
+  <div class="actions"><button id="translate" class="primary">翻譯這一頁</button><button id="toggle" class="secondary" disabled>顯示原文</button><span id="result-label"></span></div>
+  <div class="progress"><progress id="progress" max="100" value="0"></progress><span id="status" role="status" aria-live="polite">內建兩頁自製排版測試圖，亦可選擇自己的圖片。</span></div>
+  <div class="page-stage"><img id="page" src="/demo/synthetic-01.png" alt="目前測試圖或自行選取的圖片"></div>
+  <nav class="pagination"><button id="previous" class="secondary">→ 上一頁</button><span>日式閱讀方向 · ← 下一頁</span><button id="next" class="secondary">下一頁 ←</button></nav>
+</article>
+</main>
+</body></html>

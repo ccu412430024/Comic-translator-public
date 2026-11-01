@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><title>漫畫翻譯</title><link rel="stylesheet" href="popup.css"><script src="model-picker.js" defer></script><script src="readers/registry.js" defer></script><script src="readers/bookwalker.js" defer></script><script src="readers/pixiv.js" defer></script><script src="book-context.js" defer></script><script src="library-platforms.js" defer></script><script src="work-picker.js" defer></script><script src="gemini-connection.js" defer></script><script src="gemini-status.js" defer></script><script src="popup.js" defer></script></head>
+<body>
+<header><strong>漫畫翻譯</strong><span id="connection">連接中…</span></header>
+<a id="manage-library" class="manage-library" href="service.html?target=library" target="_blank" rel="noopener">管理作品資料 ↗</a>
+<button id="retry-service" class="quiet" hidden>重新啟動本機服務</button>
+<div class="two-column">
+<label>文字偵測<select id="mode"><option value="standard">RT-DETR</option><option value="tiled">RT-DETR 分塊版</option><option value="paddle">PP-OCRv6</option></select></label>
+<label>翻譯引擎<select id="translator"><option value="gemini">Gemini</option><option value="google-web">Google（免金鑰）</option></select></label>
+</div>
+<label>文字辨識（OCR）<select id="ocr-model"><option value="nar">NAR</option><option value="base" selected>Manga-OCR（預設）</option><option value="paddle">Paddle</option></select></label>
+<div id="gemini-model-controls"><label>Gemini 連線<select id="gemini-backend"><option value="developer">Google AI Studio · API 金鑰</option><option value="vertex">Vertex AI · GCP 專案</option></select></label><p id="gemini-connection-state"></p><a href="service.html?target=settings" target="_blank" rel="noopener">設定 GCP 專案與本機登入 ↗</a><label for="gemini-model">Gemini 模型<button id="check-gemini" class="preset" aria-label="測試 Gemini 連線" disabled>測試連線</button><select id="gemini-model" aria-label="Gemini 模型"><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite（預設）</option></select></label>
+<label id="custom-model-field" hidden>自訂模型 ID<input id="custom-model" type="text" maxlength="100" placeholder="gemini-…" autocomplete="off" spellcheck="false"></label>
+<label>作品上下文用量檔位<select id="memory-tokens"><option value="6000">精簡 · 6,000 估算 token</option><option value="12000" selected>標準 · 12,000（預設）</option><option value="24000">擴充 · 24,000</option><option value="48000">大量 · 48,000</option></select></label>
+<p>顯式快取成功時，此檔位限制動態記憶，固定資料另有 48,000 估算 token 額度；其餘情況限制兩者合計。本頁原文、圖片與翻譯指令另計，保留本機完整資料。修改後重新開始翻譯或自動預翻。</p>
+<p>429 共用冷卻後重試最多 4 次；503 立即重試最多 3 次。停止翻譯會取消等待及後續重試。</p>
+<details><summary>Gemini 付費加速選項</summary>
+<label>固定上下文雲端快取<select id="gemini-cache"><option value="off">關閉顯式快取（預設）</option><option value="explicit">啟用顯式快取</option></select></label>
+<p>啟用後，固定提示詞與作品資料會保存於 Google，每次重用自動續期至當下起 10 分鐘，儲存費隨保存時間計算。圖片與動態記憶不放入顯式快取。建立失敗或失效回退時按合計上限裁切；續期失敗不延長已知到期時間。</p>
+<label>服務等級<select id="gemini-tier"><option value="standard">Standard（預設）</option><option value="priority">Priority 優先推論</option></select></label>
+<p id="priority-note" class="hint">AI Studio 的 Priority 需要 Tier 2／3；Vertex AI 使用 Priority PayGo。費率與可用性依模型及專案。</p>
+<button id="clear-gemini-cache" class="quiet" type="button">清除目前雲端快取</button><p id="gemini-cloud-status" role="status"></p>
+</details></div>
+<div id="work-memory"></div>
+<div id="prefetch-field" hidden><label>自動預翻後續畫面<select id="prefetch-count"><option value="0">關閉</option><option value="1">維持後面 1 個畫面</option><option value="2">維持後面 2 個畫面</option><option value="3">維持後面 3 個畫面</option><option value="4">維持後面 4 個畫面</option><option value="5">維持後面 5 個畫面</option></select></label>
+<label>同時預翻<select id="prefetch-parallelism"><option value="1">依序：1 個畫面</option><option value="2" selected>同時最多 2 個畫面（預設）</option><option value="3">同時最多 3 個畫面</option><option value="4">同時最多 4 個畫面</option><option value="5">同時最多 5 個畫面</option></select></label>
+<p>先完成目前畫面，再同時送出後續頁面；偵測、OCR、消字與排版依序使用本機資源。並行使用已完成記憶與可用前頁原文，可能尚無前頁最新譯文；重視完整前頁記憶可選依序。API 429 時可減少同時數量。</p>
+<p>啟動一次後，隨閱讀位置持續補足後續譯圖，已完成的頁面直接重用。雙頁模式一個畫面通常是兩頁；本頁與預讀內容會送至所選翻譯服務。修改設定後請重新開始自動翻譯。</p></div>
+<label for="cleaning">消字方案<button id="comic-original" aria-label="套用 Comic Translate 原方案" class="preset" disabled>套用 Comic Translate 原方案</button><select id="cleaning" aria-label="消字方案"><option value="standard">改良版：LaMa＋氣泡清理</option><option value="comic-original">Comic Translate 原方案（AOT）</option><option value="ctd-lama">CTD 遮罩＋LaMa</option><option value="ctd-aot">CTD 遮罩＋AOT</option><option value="hybrid-lama">CTD 混合遮罩＋LaMa</option><option value="hybrid-aot">CTD 混合遮罩＋AOT</option></select></label>
+<label>排版方案<select id="layout"><option value="contour">輪廓排版＋繁體斷詞</option><option value="rectangle">基礎矩形排版</option><option value="comic-original">Comic Translate 原版 Qt 排版</option><option value="sam">SAM 2.1＋輪廓排版</option></select></label>
+<p id="processing-note" hidden></p>
+<p id="note">翻譯目前可見的漫畫畫面。</p>
+<button id="capture" class="primary" disabled>翻譯目前畫面</button>
+<button id="select" disabled>選取漫畫範圍翻譯</button>
+<button id="clear" class="quiet">移除譯圖</button>
+<button id="release-gpu" disabled>釋放 GPU</button>
+<p>停止所有分頁的翻譯與預翻，卸載 GPU 模型；下次翻譯會重新載入。</p>
+<details><summary>BookWalker 進階診斷</summary><button id="diagnose-reader" class="quiet">檢查 BookWalker 預讀</button><button id="enable-reader-network" class="quiet">啟用 BookWalker 圖片請求診斷</button><button id="enable-reader-worker" class="quiet">檢查閱讀器圖片處理</button></details>
+<p id="status" role="status"></p>
+<footer><a href="service.html?target=settings" target="_blank" rel="noopener">開啟本機設定與測試頁</a><small id="reading-note">翻頁、捲動後，請重新按一次翻譯。</small></footer>
+</body></html>

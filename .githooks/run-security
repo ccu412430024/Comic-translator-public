@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+comic_root=$(git rev-parse --show-toplevel)
+if [ -x "$comic_root/.venv/Scripts/python.exe" ]; then
+    exec "$comic_root/.venv/Scripts/python.exe" "$comic_root/scripts/security_scan.py" "$1"
+elif [ -x "$comic_root/.venv/bin/python" ]; then
+    exec "$comic_root/.venv/bin/python" "$comic_root/scripts/security_scan.py" "$1"
+elif command -v py >/dev/null 2>&1; then
+    exec py -3 "$comic_root/scripts/security_scan.py" "$1"
+elif command -v python >/dev/null 2>&1; then
+    exec python "$comic_root/scripts/security_scan.py" "$1"
+elif command -v python3 >/dev/null 2>&1; then
+    exec python3 "$comic_root/scripts/security_scan.py" "$1"
+else
+    echo 'Python 3 is required for the repository secret scan.' >&2
+    exit 2
+fi

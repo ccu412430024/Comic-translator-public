@@ -1,0 +1,2 @@
+# Optional; the accepted production pipeline does not require Jieba.
+jieba==0.42.1

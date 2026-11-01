@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>作品資料庫 · 漫畫翻譯</title><link rel="stylesheet" href="/library.css"><script src="/library-platforms.js" defer></script><script src="/model-picker.js" defer></script><script src="/recent-story.js" defer></script><script src="/library.js" defer></script></head>
+<body>
+<header class="topbar"><a class="brand" href="/library"><span class="brand-mark" aria-hidden="true">冊</span><span>漫畫翻譯<small>作品資料庫</small></span></a><nav aria-label="管理工具"><span class="local-badge"><i></i> 本機 SQLite</span><button id="export-all" class="subtle">匯出全部</button><button id="refresh" class="subtle">重新載入</button><a href="/" target="_blank" rel="noopener">翻譯設定 ↗</a></nav></header>
+<div id="message" role="status" aria-live="polite" hidden></div>
+<main class="workspace">
+<aside class="bookshelf"><div class="shelf-title"><div><span class="eyebrow">YOUR LIBRARY</span><h1>作品</h1></div><button id="create" aria-label="新增作品" class="add">＋</button></div><label class="search"><span class="sr-only">搜尋書名或作者</span><input id="search" type="search" placeholder="搜尋書名或作者…" autocomplete="off"></label><label class="platform-filter">平台<select id="platform-filter"><option value="">全部平台</option><option value="bookwalker">BookWalker</option><option value="pixiv">pixivコミック</option><option value="unassigned">未指定平台</option></select></label><p id="library-count" class="muted">正在讀取…</p><div id="books" aria-label="作品清單"></div><div class="storage-note"><strong>資料保存在這台電腦</strong><p>固定資料、原文、譯文與記憶存入 SQLite。譯圖留在服務記憶體，重啟後清除。</p></div></aside>
+<article id="content" aria-busy="true"><div class="empty"><span class="empty-icon" aria-hidden="true">冊</span><h2>正在開啟作品資料庫</h2><p>所有作品與閱讀記憶，集中在這裡。</p></div></article>
+</main>
+<dialog id="create-dialog"><form id="create-form"><span class="eyebrow">NEW WORK</span><h2>新增作品</h2><p class="muted">先建立分類，稍後可填入資料或從插件搜尋建檔。</p><label>書名<input name="title" required maxlength="300" autocomplete="off"></label><label>作者<input name="author" maxlength="200" autocomplete="off"></label><label>卷數／起始段落<input name="volume" maxlength="200" autocomplete="off"></label><div class="dialog-actions"><button type="button" id="cancel-create" class="subtle">取消</button><button type="submit" class="primary">建立作品</button></div></form></dialog>
+</body></html>

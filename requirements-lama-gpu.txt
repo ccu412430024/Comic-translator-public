@@ -1,0 +1,3 @@
+# Isolated Windows runtime; do not install beside the CPU onnxruntime package.
+numpy==2.3.5
+onnxruntime-directml==1.22.0

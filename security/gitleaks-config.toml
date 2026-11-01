@@ -1,0 +1,30 @@
+title = "Comic translator secret policy"
+minVersion = "v8.30.1"
+
+[extend]
+useDefault = true
+
+# This is a public SPKI used to keep the Chrome extension ID stable.
+# Both the exact public value and the manifest path must match.
+[[allowlists]]
+description = "Known Chrome extension PUBLIC key, not a credential"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+paths = ['''(?:^|/)chrome-extension/manifest\.json$''']
+regexes = ['''^MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA89mkyceQSswl3xvK9UxTvXouN/1ujZAdMiCwQxcxeiyjsPKH03iKjE/jaduk/JipVVClF71Us9upA9i5Ktgeg31KcKUCz7KYgM17udI30IIiHF/cid\+n/ZwnKhM4Zt3V58pXlviHJ9GZcXkmtq48YMz0WOH0vAs1GYfOukqNW0/6\+C913yqll6CUKvJYTirSNyAi2rSTJ9kMQzflLjfHNx4imlc30yMah8ROjK7Bt8RumK8S4oteXCqbDhU\+Gf0i7tPvNz81VOCWX8GgxjZX1E9butKS2H1IMT4xaawen2Q7q6LWL7M4kGqoOXDei\+TbXedIR9No1LFZ0EG9MNcVIQIDAQAB$''']
+
+[[rules]]
+id = "project-google-aq-token"
+description = "Potential Google API credential with AQ prefix"
+regex = '''\bAQ\.[A-Za-z0-9_-]{35,}\b'''
+entropy = 3.0
+keywords = ["AQ."]
+
+[[rules]]
+id = "project-oauth-refresh-token"
+description = "Literal OAuth refresh token in a credentials object"
+regex = '''(?i)["']refresh_token["']\s*:\s*["']([A-Za-z0-9_./+\-]{20,})["']'''
+secretGroup = 1
+entropy = 2.5
+keywords = ["refresh_token"]

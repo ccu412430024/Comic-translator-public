@@ -1,0 +1,79 @@
+# Local environments, downloaded models and generated native host
+.venv*/
+.runtime/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Credentials and local application data
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.key
+*.pem
+*.pfx
+*.p12
+application_default_credentials.json
+*service-account*.json
+*service_account*.json
+credentials*.json
+.git-credentials
+id_rsa
+id_ed25519
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-*
+*.sqlite3-*
+*.db-*
+*.log
+
+# Model weights, compiled binaries and distributable artifacts
+*.onnx
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.gguf
+*.exe
+*.dll
+*.zip
+*.7z
+*.whl
+
+# Reading images and generated comparison outputs
+outputs/
+samples/public/
+samples/user-provided/
+samples/jmangabench-challenge/
+samples/**/*.png
+samples/**/*.jpg
+samples/**/*.jpeg
+samples/**/*.webp
+samples/**/*.gif
+# These two smoke pages are synthetic fixtures created by this project.
+!samples/smoke/*.png
+
+# Runtime-bound diagnostics (technical Markdown reports stay versioned)
+reports/bookwalker-*.json
+reports/work-memory-*.json
+reports/reader-smoke.json
+reports/reader-processing-smoke.json
+
+# Third-party checkouts and extracted extension packages
+vendor/
+research/immersive-translate/package-*/
+research/immersive-translate/analysis/*readable.js
+research/immersive-translate/analysis/*symbols.json
+research/immersive-translate/*.zip
+research/bookwalker-prefetch/
+
+# Editor/OS local state
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini

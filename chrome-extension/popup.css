@@ -1,0 +1,14 @@
+:root{color-scheme:light;font:14px/1.6 "Microsoft JhengHei",sans-serif;color:#233c33;background:#fafbf7}
+*{box-sizing:border-box}[hidden]{display:none!important}body{width:340px;max-height:600px;overflow-y:auto;margin:0;padding:16px}
+.two-column{display:grid;grid-template-columns:1fr 1fr;gap:10px;min-width:0}.two-column label{min-width:0}.two-column select{font-size:12px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}header strong{font-size:20px}header span{font-size:11px;color:#627268}
+label{display:block;font-size:12px;margin:6px 0}
+select{width:100%;margin-top:4px;padding:7px;border:1px solid #cbd8cb;border-radius:7px;background:white;color:#233c33;font:14px "Microsoft JhengHei",sans-serif}
+input[type=text]{width:100%;margin-top:4px;padding:7px;border:1px solid #cbd8cb;border-radius:7px;background:white;color:#233c33;font:14px "Microsoft JhengHei",sans-serif}
+button{width:100%;border:1px solid #c8d8c7;border-radius:7px;padding:9px;margin-top:8px;background:#eff4e9;color:#244c37;cursor:pointer;font:14px "Microsoft JhengHei",sans-serif}
+button.primary{background:#214d39;color:white;border-color:#214d39}button.quiet{background:transparent;border-color:transparent;padding:6px;font-size:12px}button:disabled{opacity:.45;cursor:default}
+button.preset{float:right;width:auto;background:transparent;border:0;padding:0;margin:0;font-size:11px;line-height:19px;text-decoration:underline}
+p{font-size:12px;color:#627268;margin:6px 0}#status{color:#9b4033;white-space:pre-wrap}
+footer{border-top:1px solid #e1e7dc;padding-top:10px}a{color:#275d42;font-size:12px}small{display:block;font-size:11px;color:#627268;margin-top:6px}
+.work-check{display:flex;align-items:center;gap:6px;font-size:11px}#work-memory{border-block:1px solid #e1e7dc;padding:8px 0;margin:8px 0}#work-memory details{font-size:12px}#work-memory [data-work=state]{overflow-wrap:anywhere}
+.manage-library{display:block;text-align:center;padding:8px;border:1px solid #cad8c3;background:#edf2e7;border-radius:7px;margin-bottom:12px;font-size:13px;text-decoration:none}

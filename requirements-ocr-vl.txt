@@ -1,0 +1,11 @@
+# Install torch==2.4.1+cpu and torchvision==0.19.1+cpu from the official
+# https://download.pytorch.org/whl/cpu index first, in .venv-ocr-vl.
+torch-directml==0.2.5.dev240914
+transformers==4.57.1
+accelerate==1.10.1
+numpy==1.26.4
+Pillow==12.3.0
+sentencepiece==0.2.2
+einops==0.8.2
+# Phase two: PaddleOCR-VL 1.6 manga v4 adapter merge (isolated experiments only).
+peft==0.17.1

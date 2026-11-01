@@ -1,0 +1,6 @@
+# Separate .venv-ocr-experiments; production environments are unchanged.
+onnxruntime-directml==1.22.0
+numpy==2.3.5
+Pillow==12.3.0
+onnx==1.20.1
+tokenizers==0.22.2

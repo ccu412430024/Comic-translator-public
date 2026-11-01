@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "漫畫翻譯本機測試",
+  "version": "0.22.2",
+  "description": "擷取目前可見的漫畫，使用本機偵測、OCR、消字與排字，並覆蓋回原位置。",
+  "minimum_chrome_version": "116",
+  "permissions": ["activeTab", "scripting", "storage", "nativeMessaging"],
+  "host_permissions": ["http://127.0.0.1:8765/*"],
+  "optional_permissions": ["webRequest"],
+  "optional_host_permissions": ["https://bw-bv-epubs.bookwalker.jp/*"],
+  "background": {"service_worker": "background.js", "type": "module"},
+  "action": {"default_title": "漫畫翻譯", "default_popup": "popup.html"},
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA89mkyceQSswl3xvK9UxTvXouN/1ujZAdMiCwQxcxeiyjsPKH03iKjE/jaduk/JipVVClF71Us9upA9i5Ktgeg31KcKUCz7KYgM17udI30IIiHF/cid+n/ZwnKhM4Zt3V58pXlviHJ9GZcXkmtq48YMz0WOH0vAs1GYfOukqNW0/6+C913yqll6CUKvJYTirSNyAi2rSTJ9kMQzflLjfHNx4imlc30yMah8ROjK7Bt8RumK8S4oteXCqbDhU+Gf0i7tPvNz81VOCWX8GgxjZX1E9butKS2H1IMT4xaawen2Q7q6LWL7M4kGqoOXDei+TbXedIR9No1LFZ0EG9MNcVIQIDAQAB"
+}
